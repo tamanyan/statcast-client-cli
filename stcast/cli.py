@@ -7,7 +7,6 @@ socket.setdefaulttimeout(30)
 
 BASE_URL = 'https://baseballsavant.mlb.com/statcast_search/csv'
 
-
 """
 https://baseballsavant.mlb.com/statcast_search
 ?hfPT=
@@ -18,9 +17,9 @@ https://baseballsavant.mlb.com/statcast_search
 &stadium=
 &hfBBL=
 &hfNewZones=
-&hfGT=R%7C
+&hfGT=R|
 &hfC=
-&hfSea=2017%7C
+&hfSea=2017|
 &hfSit=
 &player_type=pitcher
 &hfOuts=
@@ -58,20 +57,42 @@ def reporthook(blocknum, blocksize, totalsize):
     else: # total size is unknown
         sys.stderr.write("read %d\n" % (readsofar,))
 
+help_pitch_type = """Picth Type:
+FF 4-seam Fastball
+FT 2-seam Fastball
+FC Cut Fastball
+FS Split-finger
+SI Sinker
+SL Slider
+CH Changeup
+CU Curveball
+KC Knuckle Curve
+KN Knuckleball
+FO Forkball
+EP Eephus
+SC Screwball
+"""
 
 @click.command()
-@click.option('--body', '-b', is_flag=True, default=False, help='Only the response body is printed')
-@click.option('--min_pitches', '-m', default=1000, help='Min # of Total Pitches')
+@click.option('--season', '-s', default='2017|', help='Season. default is 2017|')
+@click.option('--pitch_type', '-p', default='', help=help_pitch_type)
+@click.option('--zone', '-z', default='', help='Pitch zone: Strike Zone (1 ~ 9), Ball Zone (11 ~ 14)')
+@click.option('--min_pitches', '-m', default=1000, help='Min # of Total Pitches. default is 1000')
+@click.option('--game_date_gt', '-gt', default='', help='Game Date Greater Than')
+@click.option('--game_date_lt', '-lt', default='', help='Game Date Less Than')
+@click.option('--home_road', '-hr', default='', help='Home or Road Game')
+@click.option('--player_id', '-pi', default='', help='Player ID')
+@click.option('--body', '-b', is_flag=True, default=False, help='Only the response body is printed. default is true')
 @click.argument('filename', default='result.csv', required=False)
-def main(filename, body, min_pitches):
+def main(filename, season, pitch_type, zone, min_pitches, game_date_gt, game_date_lt, home_road, player_id, body):
     """Statcast Http Client CLI"""
 
     # request params
     params = {
         'group_by': 'name',
-        'hfGT': 'R|',
-        'hfSea': '2017|',
-        'hfZ': '1|2|3|4|5|6|7|8|9|',
+        'hfGT': 'R|L',
+        'hfSea': season,
+        'hfZ': zone,
         'min_abs': '0#results',
         'min_pitches': min_pitches,
         'min_results': '0',
@@ -79,7 +100,7 @@ def main(filename, body, min_pitches):
         'player_type': 'pitcher',
         'sort_col': 'pitches',
         'sort_order': 'desc',
-        'hfPT': '',
+        'hfPT': pitch_type,
         'hfAB': '',
         'hfBBT': '',
         'hfPR': '',
@@ -93,15 +114,17 @@ def main(filename, body, min_pitches):
         'pitcher_throws': '',
         'batter_stands': '',
         'hfSA': '',
-        'game_date_gt': '',
-        'game_date_lt': '',
+        'game_date_gt': game_date_gt,
+        'game_date_lt': game_date_lt,
         'team': '',
         'position': '',
         'hfRO': '',
-        'home_road': '',
+        'home_road': home_road,
         'hfFlag': '',
         'metric_1': '',
-        'hfInn': ''
+        'hfInn': '',
+        'type': 'detail' if len(player_id) > 0 else '',
+        'player_id': player_id
     }
 
     # request url
