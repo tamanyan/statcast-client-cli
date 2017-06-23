@@ -58,19 +58,19 @@ def reporthook(blocknum, blocksize, totalsize):
         sys.stderr.write("read %d\n" % (readsofar,))
 
 help_pitch_type = """Picth Type:
-FF 4-seam Fastball
-FT 2-seam Fastball
-FC Cut Fastball
-FS Split-finger
-SI Sinker
-SL Slider
-CH Changeup
-CU Curveball
-KC Knuckle Curve
-KN Knuckleball
-FO Forkball
-EP Eephus
-SC Screwball
+FF(4-seam Fastball)
+FT(2-seam Fastball)
+FC(Cut Fastball)
+FS(Split-finger)
+SI(Sinker)
+SL(Slider)
+CH(Changeup)
+CU(Curveball)
+KC(Knuckle Curve)
+KN(Knuckleball)
+FO(Forkball)
+EP(Eephus)
+SC(Screwball)
 """
 
 @click.command()
@@ -82,9 +82,8 @@ SC Screwball
 @click.option('--game_date_lt', '-lt', default='', help='Game Date Less Than')
 @click.option('--home_road', '-hr', default='', help='Home or Road Game')
 @click.option('--player_id', '-pi', default='', help='Player ID')
-@click.option('--body', '-b', is_flag=True, default=False, help='Only the response body is printed. default is true')
-@click.argument('filename', default='result.csv', required=False)
-def main(filename, season, pitch_type, zone, min_pitches, game_date_gt, game_date_lt, home_road, player_id, body):
+@click.option('--body', '-b', is_flag=True, default=False, help='Only the response body is printed. default is false')
+def main(season, pitch_type, zone, min_pitches, game_date_gt, game_date_lt, home_road, player_id, body):
     """Statcast Http Client CLI"""
 
     # request params
